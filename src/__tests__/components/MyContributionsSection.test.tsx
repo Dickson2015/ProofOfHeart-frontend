@@ -5,6 +5,29 @@ import { useContributions, type ContributionHistoryItem } from "@/hooks/useContr
 import { claimAllRefunds } from "@/lib/contractClient";
 import { Category, type Campaign } from "@/types";
 
+// next-intl and @/i18n/routing ship as ESM which Jest cannot parse without
+// a transform. Mock them so the test environment stays in CommonJS.
+jest.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => key,
+  useLocale: () => "en",
+}));
+
+jest.mock("@/i18n/routing", () => ({
+  Link: ({
+    href,
+    children,
+    ...props
+  }: {
+    href: string;
+    children: React.ReactNode;
+    [key: string]: unknown;
+  }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
+}));
+
 jest.mock("@/hooks/useContributions", () => ({
   useContributions: jest.fn(),
 }));
